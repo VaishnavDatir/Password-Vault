@@ -1,10 +1,9 @@
-import 'package:crypt/crypt.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:password_vault/app/app.logger.dart';
-import 'package:password_vault/core/constants/remote_config.constants.dart';
 import 'package:password_vault/services/firebase/remote_config_service.dart';
 
 import '../../app/app.locator.dart';
+import '../constants/remote_config.constants.dart';
 
 class StringHandler {
   final logger = getLogger('StringHandler');
@@ -22,21 +21,18 @@ class StringHandler {
   }
 
   String encryptAuthPass(plainText, String id) {
-    plainText = Crypt.sha256(plainText);
-    final encrypter = Encrypter(AES(key!));
+    final encrypter = Encrypter(AES(key!, mode: AESMode.ofb64Gctr));
     Encrypted encrypted = encrypter.encrypt(plainText.toString(),
         iv: IV.fromUtf8(
             _remoteConfig.getString(id.padRight(16, 'v').substring(0, 16))));
-    String encryptedStr = encrypted.base64.toString();
-    return encryptedStr;
+    return encrypted.base64.toString();
   }
 
-  Crypt decryptAuthPass(encryptedStr, String id) {
-    final encrypter = Encrypter(AES(key!));
+  String decryptAuthPass(encryptedStr, String id) {
+    final encrypter = Encrypter(AES(key!, mode: AESMode.ofb64Gctr));
     String decrypted = encrypter.decrypt64(encryptedStr,
         iv: IV.fromUtf8(
             _remoteConfig.getString(id.padRight(16, 'v').substring(0, 16))));
-    Crypt decryptedStr = Crypt(decrypted);
-    return (decryptedStr);
+    return (decrypted);
   }
 }

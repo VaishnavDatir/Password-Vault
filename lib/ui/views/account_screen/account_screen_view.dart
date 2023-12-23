@@ -14,8 +14,13 @@ class AccountScreenView extends StackedView<AccountScreenViewModel> {
   ) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
-      body: Container(
-        padding: const EdgeInsets.only(left: 25.0, right: 25.0),
+      body: SafeArea(
+        child: Container(
+          padding: const EdgeInsets.only(left: 25.0, right: 25.0),
+          child: ElevatedButton(
+              onPressed: () => viewModel.signOutUser(),
+              child: const Text("sign out")),
+        ),
       ),
     );
   }

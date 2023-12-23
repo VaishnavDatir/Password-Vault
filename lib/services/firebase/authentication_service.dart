@@ -19,9 +19,9 @@ class AuthenticationService {
     return Future.value(_instance);
   }
 
-  Future getCurrentUser() async {
+  User getCurrentUser() {
     User? user = _firebaseAuth!.currentUser;
-    return user;
+    return user!;
   }
 
   Future<UserCredential> signUpUserWithEmailPassword(

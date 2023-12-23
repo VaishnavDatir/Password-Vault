@@ -18,7 +18,7 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   late final TabController _tabController;
 
   @override
@@ -27,8 +27,15 @@ class _HomeViewState extends State<HomeView>
     super.initState();
   }
 
+  final _pages = const [
+    MainScreenView(key: PageStorageKey("mainScreenView")),
+    VaultScreenView(key: PageStorageKey("vaultScreenView")),
+    AccountScreenView(key: PageStorageKey("accountScreenView"))
+  ];
+
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return ViewModelBuilder<HomeViewModel>.reactive(
       viewModelBuilder: () => HomeViewModel(_tabController),
       onViewModelReady: (viewModel) => viewModel.initializeModel(),
@@ -36,19 +43,13 @@ class _HomeViewState extends State<HomeView>
         return Scaffold(
             extendBody: true,
             body: TabBarView(
-              controller: viewModel.tabController,
-              children: const [
-                MainScreenView(),
-                VaultScreenView(),
-                AccountScreenView()
-              ],
-            ),
+                controller: viewModel.tabController, children: _pages),
             bottomNavigationBar: Container(
               width: screenWidth(context),
               margin: const EdgeInsets.symmetric(
-                  horizontal: kLargeSpace, vertical: kLargeSpace),
+                  horizontal: kLargeSpace, vertical: kSmallSpace),
               padding: const EdgeInsets.symmetric(
-                  horizontal: kLargeSpace, vertical: kMediumSpace),
+                  horizontal: kLargeSpace, vertical: kSmallSpace),
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey.withAlpha(80)),
                 borderRadius: BorderRadius.circular(200),
@@ -65,33 +66,43 @@ class _HomeViewState extends State<HomeView>
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   customBottomBarItem(
-                      () {}, Icons.home_filled, "Home", viewModel, 0),
+                          () {}, Icons.home_filled, "Home", viewModel, 0)
+                      .animate()
+                      .fadeIn(delay: const Duration(milliseconds: 500)),
                   customBottomBarItem(
-                      () {}, Icons.security, "Vault", viewModel, 1),
+                          () {}, Icons.security, "Vault", viewModel, 1)
+                      .animate()
+                      .fadeIn(delay: const Duration(milliseconds: 500)),
                   customBottomBarItem(() {}, Icons.account_circle_outlined,
-                      "Account", viewModel, 2),
+                          "Account", viewModel, 2)
+                      .animate()
+                      .fadeIn(delay: const Duration(milliseconds: 500)),
                   OpenContainer(
                     clipBehavior: Clip.antiAlias,
                     closedShape: const CircleBorder(),
-                    closedColor: kcPrimaryColorDark,
+                    closedColor: kcWhite,
                     closedElevation: 0,
+                    openColor: kcWhite,
                     transitionType: ContainerTransitionType.fadeThrough,
-                    transitionDuration: const Duration(milliseconds: 700),
-                    onClosed: (data) {
-                      print("$data");
-                    },
+                    transitionDuration: const Duration(milliseconds: 500),
+                    middleColor: kcWhite,
+                    openShape: const RoundedRectangleBorder(),
                     closedBuilder: (context, action) {
-                      return FloatingActionButton(
-                        backgroundColor: kcPrimaryColorDark,
-                        shape: const CircleBorder(),
-                        onPressed: action,
-                        child: const Icon(Icons.add_moderator, color: kcWhite),
+                      return Tooltip(
+                        message: "Add new password",
+                        child: FloatingActionButton.small(
+                          backgroundColor: kcPrimaryColorDark,
+                          shape: const CircleBorder(),
+                          onPressed: action,
+                          child:
+                              const Icon(Icons.add_moderator, color: kcWhite),
+                        ),
                       );
                     },
                     openBuilder: (context, action) {
                       return const AddPasswordView();
                     },
-                  ),
+                  ).animate().fadeIn(delay: const Duration(milliseconds: 500)),
                 ],
               ),
             ).animate().scale().slideY());
@@ -103,24 +114,17 @@ class _HomeViewState extends State<HomeView>
       HomeViewModel viewModel, int index) {
     return InkWell(
       onTap: () => viewModel.tabController.animateTo(index),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            iconData,
-            color:
-                viewModel.selectedIndex == index ? kcPrimaryColorDark : kcBlack,
-          ),
-          Text(
-            title,
-            style: TextStyle(
-              color: viewModel.selectedIndex == index
-                  ? kcPrimaryColorDark
-                  : kcBlack,
-            ),
-          )
-        ],
+      child: Tooltip(
+        message: title,
+        child: Icon(
+          iconData,
+          color:
+              viewModel.selectedIndex == index ? kcPrimaryColorDark : kcBlack,
+        ),
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

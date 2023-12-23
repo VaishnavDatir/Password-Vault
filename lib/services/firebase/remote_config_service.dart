@@ -15,6 +15,7 @@ class RemoteConfigService {
         kRcEncryptionKeyParamName: kRcEncryptionKeyValue,
         kRcIvKeyParamName: kRcIvKeyValue,
       }).then((value) => _instance = RemoteConfigService());
+      _instance = RemoteConfigService();
     }
     return Future.value(_instance);
   }

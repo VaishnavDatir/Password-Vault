@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:password_vault/app/app.locator.dart';
+import 'package:password_vault/app/app.logger.dart';
 import 'package:password_vault/app/app.router.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
 class HomeViewModel extends BaseViewModel {
+  final logger = getLogger('HomeViewModel');
+
   final _navigationService = locator<NavigationService>();
 
   late final TabController _tabController;
