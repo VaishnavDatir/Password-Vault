@@ -7,6 +7,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:flutter/material.dart' as _i11;
 import 'package:flutter/material.dart';
+import 'package:password_vault/model/password.model.dart' as _i12;
 import 'package:password_vault/ui/views/account_screen/account_screen_view.dart'
     as _i10;
 import 'package:password_vault/ui/views/add_password/add_password_view.dart'
@@ -22,7 +23,7 @@ import 'package:password_vault/ui/views/startup/startup_view.dart' as _i3;
 import 'package:password_vault/ui/views/vault_screen/vault_screen_view.dart'
     as _i9;
 import 'package:stacked/stacked.dart' as _i1;
-import 'package:stacked_services/stacked_services.dart' as _i12;
+import 'package:stacked_services/stacked_services.dart' as _i13;
 
 class Routes {
   static const homeView = '/home-view';
@@ -122,14 +123,20 @@ class StackedRouter extends _i1.RouterBase {
       );
     },
     _i6.AddPasswordView: (data) {
+      final args = data.getArgs<AddPasswordViewArguments>(
+        orElse: () => const AddPasswordViewArguments(),
+      );
       return _i11.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i6.AddPasswordView(),
+        builder: (context) => _i6.AddPasswordView(
+            passwordModel: args.passwordModel, key: args.key),
         settings: data,
       );
     },
     _i7.PasswordDetailView: (data) {
+      final args = data.getArgs<PasswordDetailViewArguments>(nullOk: false);
       return _i11.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i7.PasswordDetailView(),
+        builder: (context) =>
+            _i7.PasswordDetailView(args.passwordModel, key: args.key),
         settings: data,
       );
     },
@@ -160,7 +167,61 @@ class StackedRouter extends _i1.RouterBase {
   Map<Type, _i1.StackedRouteFactory> get pagesMap => _pagesMap;
 }
 
-extension NavigatorStateExtension on _i12.NavigationService {
+class AddPasswordViewArguments {
+  const AddPasswordViewArguments({
+    this.passwordModel,
+    this.key,
+  });
+
+  final _i12.PasswordModel? passwordModel;
+
+  final _i11.Key? key;
+
+  @override
+  String toString() {
+    return '{"passwordModel": "$passwordModel", "key": "$key"}';
+  }
+
+  @override
+  bool operator ==(covariant AddPasswordViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.passwordModel == passwordModel && other.key == key;
+  }
+
+  @override
+  int get hashCode {
+    return passwordModel.hashCode ^ key.hashCode;
+  }
+}
+
+class PasswordDetailViewArguments {
+  const PasswordDetailViewArguments({
+    required this.passwordModel,
+    this.key,
+  });
+
+  final _i12.PasswordModel passwordModel;
+
+  final _i11.Key? key;
+
+  @override
+  String toString() {
+    return '{"passwordModel": "$passwordModel", "key": "$key"}';
+  }
+
+  @override
+  bool operator ==(covariant PasswordDetailViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.passwordModel == passwordModel && other.key == key;
+  }
+
+  @override
+  int get hashCode {
+    return passwordModel.hashCode ^ key.hashCode;
+  }
+}
+
+extension NavigatorStateExtension on _i13.NavigationService {
   Future<dynamic> navigateToHomeView([
     int? routerId,
     bool preventDuplicates = true,
@@ -217,28 +278,36 @@ extension NavigatorStateExtension on _i12.NavigationService {
         transition: transition);
   }
 
-  Future<dynamic> navigateToAddPasswordView([
+  Future<dynamic> navigateToAddPasswordView({
+    _i12.PasswordModel? passwordModel,
+    _i11.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
+  }) async {
     return navigateTo<dynamic>(Routes.addPasswordView,
+        arguments:
+            AddPasswordViewArguments(passwordModel: passwordModel, key: key),
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
         transition: transition);
   }
 
-  Future<dynamic> navigateToPasswordDetailView([
+  Future<dynamic> navigateToPasswordDetailView({
+    required _i12.PasswordModel passwordModel,
+    _i11.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
+  }) async {
     return navigateTo<dynamic>(Routes.passwordDetailView,
+        arguments:
+            PasswordDetailViewArguments(passwordModel: passwordModel, key: key),
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
@@ -343,28 +412,36 @@ extension NavigatorStateExtension on _i12.NavigationService {
         transition: transition);
   }
 
-  Future<dynamic> replaceWithAddPasswordView([
+  Future<dynamic> replaceWithAddPasswordView({
+    _i12.PasswordModel? passwordModel,
+    _i11.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
+  }) async {
     return replaceWith<dynamic>(Routes.addPasswordView,
+        arguments:
+            AddPasswordViewArguments(passwordModel: passwordModel, key: key),
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
         transition: transition);
   }
 
-  Future<dynamic> replaceWithPasswordDetailView([
+  Future<dynamic> replaceWithPasswordDetailView({
+    required _i12.PasswordModel passwordModel,
+    _i11.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
+  }) async {
     return replaceWith<dynamic>(Routes.passwordDetailView,
+        arguments:
+            PasswordDetailViewArguments(passwordModel: passwordModel, key: key),
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,

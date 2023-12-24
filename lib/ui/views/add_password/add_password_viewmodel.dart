@@ -1,21 +1,30 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:password_vault/app/app.bottomsheets.dart';
 import 'package:password_vault/app/app.dialogs.dart';
 import 'package:password_vault/app/app.locator.dart';
 import 'package:password_vault/app/app.logger.dart';
+import 'package:password_vault/app/app.router.dart';
 import 'package:password_vault/app/app.shared_prefs.dart';
 import 'package:password_vault/core/constants/share_prefs.constants.dart';
 import 'package:password_vault/core/util/common_utils.dart';
 import 'package:password_vault/core/util/string_handler.dart';
 import 'package:password_vault/model/password.model.dart';
-import 'package:password_vault/services/firebase/authentication_service.dart';
+import 'package:password_vault/model/prev_pass.model.dart';
 import 'package:password_vault/services/firebase/password_firestore_service.dart';
 import 'package:password_vault/services/firebase/user_firestore_service.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
 class AddPasswordViewModel extends BaseViewModel {
+  late PasswordModel? _passwordModel;
+  PasswordModel? get passwordModel => _passwordModel;
+
+  AddPasswordViewModel(PasswordModel? passwordModel) {
+    _passwordModel = passwordModel;
+  }
+
   final logger = getLogger('AddPasswordViewModel');
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -23,7 +32,6 @@ class AddPasswordViewModel extends BaseViewModel {
 
   final _navigationService = locator<NavigationService>();
   final _bottomSheetService = locator<BottomSheetService>();
-  final _authenticationService = locator<AuthenticationService>();
   final _userFirestoreService = locator<UserFirestoreService>();
   final _passwordFirestoreService = locator<PasswordFirestoreService>();
   final _dialougeService = locator<DialogService>();
@@ -80,7 +88,7 @@ class AddPasswordViewModel extends BaseViewModel {
 
   //
 
-  final List<String> _tagList = [];
+  List<String> _tagList = List.empty(growable: true);
   List<String> get tagList => _tagList;
 
   final List<String> _sharedUsersList = [];
@@ -98,7 +106,8 @@ class AddPasswordViewModel extends BaseViewModel {
 
   void addInTagList() async {
     List<Object?> spRecentTagList =
-        await _sharedPrefsService.read(kSpRecentTagList);
+        await _sharedPrefsService.read(kSpRecentTagList) ??
+            List.empty(growable: true);
     List<String> recentTags = (spRecentTagList.isNotEmpty)
         ? spRecentTagList.map((e) => e.toString()).toList()
         : List.empty(growable: true);
@@ -155,7 +164,7 @@ class AddPasswordViewModel extends BaseViewModel {
 
   //
 
-  void handleCreate() async {
+  void handleButtonClick() async {
     try {
       _bottomSheetService.showCustomSheet(
           variant: BottomSheetType.loading,
@@ -163,19 +172,17 @@ class AddPasswordViewModel extends BaseViewModel {
           barrierDismissible: false,
           takesInput: false,
           description: "Please wait while we setup your account");
-      await _savePassword();
-      _navigationService.back();
-      await _dialougeService.showCustomDialog(
-          variant: DialogType.error,
-          title: "Done",
-          description: "Password added to vault");
-      _navigationService.back();
+      if (_passwordModel != null) {
+        await handleUpdate();
+      } else {
+        await handleCreate();
+      }
     } on FirebaseException catch (e) {
       logger.e(e);
       _navigationService.back();
       await _dialougeService.showCustomDialog(
           variant: DialogType.error, title: "Oops", description: e.message);
-    } on Exception catch (ex) {
+    } catch (ex) {
       logger.e(ex);
       _navigationService.back();
       await _dialougeService.showCustomDialog(
@@ -185,7 +192,85 @@ class AddPasswordViewModel extends BaseViewModel {
     }
   }
 
-  Future<void> _savePassword() async {
+  Future<void> handleUpdate() async {
+    List<String> updatedItems = _getListOfUpdatedItems();
+
+    if (updatedItems.isNotEmpty) {
+      List<PrevPassModel> prevPassList =
+          _passwordModel?.prevPass ?? List.empty(growable: true);
+
+      prevPassList.add(PrevPassModel(
+          name: _passwordModel?.name,
+          note: _passwordModel?.note,
+          password: _stringHandler.encryptAuthPass(
+              _passwordModel!.password!, _passwordModel!.id!),
+          username: _stringHandler.encryptAuthPass(
+              _passwordModel!.username!, _passwordModel!.id!),
+          tags: _passwordModel?.tags,
+          updateTime: DateTime.now(),
+          updateType: "Updated ${updatedItems.join(", ")}"));
+
+      PasswordModel passwordModel = PasswordModel(
+          authorId: _userFirestoreService.currentUser!.id,
+          name: _titleTC.text.trim(),
+          tags: tagList,
+          note: _notesTC.text.trim(),
+          createDate: _passwordModel!.createDate,
+          updateTime: DateTime.now(),
+          id: _passwordModel?.id,
+          username: _stringHandler.encryptAuthPass(
+              _usernameTC.text.trim(), _passwordModel!.id!),
+          password: _stringHandler.encryptAuthPass(
+              _passwordTC.text.trim(), _passwordModel!.id!),
+          prevPass: prevPassList);
+
+      await _passwordFirestoreService.updatePassword(passwordModel);
+      _navigationService.clearStackAndShow(Routes.homeView);
+
+      await _dialougeService.showCustomDialog(
+          variant: DialogType.error,
+          title: "Done",
+          description: "Details updated in vault");
+    } else {
+      await _dialougeService.showCustomDialog(
+          variant: DialogType.infoAlert,
+          title: "Sure",
+          description: "Nothing is here to update!");
+    }
+    _navigationService.back();
+  }
+
+  List<String> _getListOfUpdatedItems() {
+    List<String> updatedItems = List.empty(growable: true);
+    if (_passwordModel?.name != _titleTC.text.trim()) {
+      updatedItems.add("Title");
+    }
+    if (!listEquals(_passwordModel?.tags, _tagList)) {
+      updatedItems.add("Tags");
+    }
+    if (_passwordModel?.note != _notesTC.text.trim()) {
+      updatedItems.add("Notes");
+    }
+    if (_passwordModel?.password != _passwordTC.text.trim()) {
+      updatedItems.add("Password");
+    }
+    if (_passwordModel?.username != _usernameTC.text.trim()) {
+      updatedItems.add("Username");
+    }
+    return updatedItems;
+  }
+
+  Future<void> handleCreate() async {
+    await savePassword();
+    _navigationService.clearStackAndShow(Routes.homeView);
+    await _dialougeService.showCustomDialog(
+        variant: DialogType.error,
+        title: "Done",
+        description: "Password added to vault");
+    _navigationService.back();
+  }
+
+  Future<void> savePassword() async {
     PasswordModel passwordModel = PasswordModel(
       authorId: _userFirestoreService.currentUser!.id,
       name: _titleTC.text.trim(),
@@ -205,10 +290,25 @@ class AddPasswordViewModel extends BaseViewModel {
         updateTime: DateTime.now(),
         id: documentReference.id,
         isFav: false,
-        username: _stringHandler.encryptAuthPass(
-            _usernameTC.text.trim(), documentReference.id),
+        username: _usernameTC.text.trim().isEmpty
+            ? null
+            : _stringHandler.encryptAuthPass(
+                _usernameTC.text.trim(), documentReference.id),
         password: _stringHandler.encryptAuthPass(
             _passwordTC.text.trim(), documentReference.id));
     await _passwordFirestoreService.updatePassword(passwordModel);
+  }
+
+  void initializeScreen() {
+    if (_passwordModel != null) {
+      _titleTC.text = _passwordModel!.name ?? "";
+      _usernameTC.text = _passwordModel!.username ?? "";
+      _passwordTC.text = _passwordModel!.password ?? "";
+      _notesTC.text = _passwordModel!.note ?? "";
+      // _tagList =  _passwordModel?.tags ?? List.empty(growable: true);
+      _tagList = _passwordModel?.tags?.map((e) => e.toString()).toList() ??
+          List.empty(growable: true);
+    }
+    notifyListeners();
   }
 }

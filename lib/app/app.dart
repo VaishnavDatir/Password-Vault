@@ -7,6 +7,7 @@ import 'package:password_vault/ui/bottom_sheets/loading/loading_sheet.dart';
 import 'package:password_vault/ui/bottom_sheets/notice/notice_sheet.dart';
 import 'package:password_vault/ui/dialogs/error/error_dialog.dart';
 import 'package:password_vault/ui/dialogs/info_alert/info_alert_dialog.dart';
+import 'package:password_vault/ui/dialogs/input_string_dialog/input_string_dialog_dialog.dart';
 import 'package:password_vault/ui/views/account_screen/account_screen_view.dart';
 import 'package:password_vault/ui/views/add_password/add_password_view.dart';
 import 'package:password_vault/ui/views/home/home_view.dart';
@@ -21,20 +22,20 @@ import 'package:stacked_services/stacked_services.dart';
 import 'package:stacked_themes/stacked_themes.dart';
 
 import '../core/util/string_handler.dart';
-import 'package:password_vault/ui/dialogs/input_string_dialog/input_string_dialog_dialog.dart';
 // @stacked-import
 
 @StackedApp(
   logger: StackedLogger(),
   routes: [
-    MaterialRoute(page: HomeView),
+    MaterialRoute(page: HomeView, maintainState: true),
     MaterialRoute(page: StartupView),
     MaterialRoute(page: LoginView),
     MaterialRoute(page: SignUpView),
     MaterialRoute(page: AddPasswordView),
     MaterialRoute(page: PasswordDetailView),
     MaterialRoute(page: MainScreenView),
-    MaterialRoute(page: VaultScreenView),
+    MaterialRoute(
+        page: VaultScreenView, maintainState: true, deferredLoading: true),
     MaterialRoute(page: AccountScreenView),
 // @stacked-route
   ],

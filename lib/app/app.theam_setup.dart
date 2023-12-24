@@ -1,20 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:password_vault/app/app.locator.dart';
+import 'package:password_vault/app/app.shared_prefs.dart';
+import 'package:password_vault/core/constants/share_prefs.constants.dart';
 import 'package:password_vault/ui/common/app_colors.dart';
 
 import '../ui/common/ui_helpers.dart';
 
+final _sharedPrefsService = locator<SharedPreferencesService>();
+
 ThemeData getLightTheme() {
   return ThemeData(
+      brightness: Brightness.light,
       useMaterial3: true,
       primaryColor: kcPrimaryColor,
       primaryColorDark: kcPrimaryColorDark,
       primaryColorLight: kcPrimaryColorLight,
       canvasColor: kcWhite,
+      cardTheme: const CardTheme(color: kcWhite, surfaceTintColor: kcWhite),
       cardColor: kcWhite,
+      inputDecorationTheme: const InputDecorationTheme(
+        focusColor: kcPrimaryColorDark,
+      ),
       scaffoldBackgroundColor: kcWhite,
-      colorScheme: const ColorScheme.light(),
       primaryTextTheme: GoogleFonts.poppinsTextTheme(),
       textTheme: GoogleFonts.latoTextTheme(),
       chipTheme: const ChipThemeData(
@@ -53,11 +62,25 @@ ThemeData getLightTheme() {
             systemOverlayStyle: SystemUiOverlayStyle.dark,
             toolbarTextStyle: GoogleFonts.promptTextTheme().displayLarge,
             titleTextStyle: GoogleFonts.promptTextTheme().displayLarge,
-          ));
+          ),
+      colorScheme: const ColorScheme.light().copyWith(background: kcWhite));
 }
 
 ThemeData getDarkTheme() {
   return ThemeData(
+    brightness: Brightness.light,
     useMaterial3: true,
   );
+}
+
+setSystemTheme() {
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    statusBarBrightness: Brightness.light,
+    statusBarIconBrightness: _sharedPrefsService.read(kSpCurrentTheme) == 1
+        ? Brightness.light
+        : Brightness.dark,
+    statusBarColor: Colors.transparent,
+    systemNavigationBarColor: Colors.white,
+    systemNavigationBarIconBrightness: Brightness.dark,
+  ));
 }

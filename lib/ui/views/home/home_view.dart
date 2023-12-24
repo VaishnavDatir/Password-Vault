@@ -6,7 +6,6 @@ import 'package:password_vault/ui/common/ui_helpers.dart';
 import 'package:password_vault/ui/views/account_screen/account_screen_view.dart';
 import 'package:password_vault/ui/views/add_password/add_password_view.dart';
 import 'package:password_vault/ui/views/home/home_viewmodel.dart';
-import 'package:password_vault/ui/views/main_screen/main_screen_view.dart';
 import 'package:password_vault/ui/views/vault_screen/vault_screen_view.dart';
 import 'package:stacked/stacked.dart';
 
@@ -23,12 +22,12 @@ class _HomeViewState extends State<HomeView>
 
   @override
   void initState() {
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: _pages.length, vsync: this);
     super.initState();
   }
 
   final _pages = const [
-    MainScreenView(key: PageStorageKey("mainScreenView")),
+    // MainScreenView(key: PageStorageKey("mainScreenView")),
     VaultScreenView(key: PageStorageKey("vaultScreenView")),
     AccountScreenView(key: PageStorageKey("accountScreenView"))
   ];
@@ -55,9 +54,9 @@ class _HomeViewState extends State<HomeView>
                 borderRadius: BorderRadius.circular(200),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.shade400.withAlpha(150),
+                    color: Colors.grey.shade300.withAlpha(150),
                     blurRadius: 5.0,
-                    spreadRadius: 2.0,
+                    spreadRadius: 0.0,
                   ),
                 ],
                 color: Theme.of(context).cardColor.withOpacity(0.7),
@@ -65,16 +64,16 @@ class _HomeViewState extends State<HomeView>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
+                  // customBottomBarItem(
+                  //         () {}, Icons.home_filled, "Home", viewModel, 0)
+                  //     .animate()
+                  //     .fadeIn(delay: const Duration(milliseconds: 500)),
                   customBottomBarItem(
-                          () {}, Icons.home_filled, "Home", viewModel, 0)
-                      .animate()
-                      .fadeIn(delay: const Duration(milliseconds: 500)),
-                  customBottomBarItem(
-                          () {}, Icons.security, "Vault", viewModel, 1)
+                          () {}, Icons.security, "Vault", viewModel, 0)
                       .animate()
                       .fadeIn(delay: const Duration(milliseconds: 500)),
                   customBottomBarItem(() {}, Icons.account_circle_outlined,
-                          "Account", viewModel, 2)
+                          "Account", viewModel, 1)
                       .animate()
                       .fadeIn(delay: const Duration(milliseconds: 500)),
                   OpenContainer(

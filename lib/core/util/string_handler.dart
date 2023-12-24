@@ -20,7 +20,7 @@ class StringHandler {
     return Future.value(_instance);
   }
 
-  String encryptAuthPass(plainText, String id) {
+  String encryptAuthPass(String plainText, String id) {
     final encrypter = Encrypter(AES(key!, mode: AESMode.ofb64Gctr));
     Encrypted encrypted = encrypter.encrypt(plainText.toString(),
         iv: IV.fromUtf8(
@@ -28,9 +28,9 @@ class StringHandler {
     return encrypted.base64.toString();
   }
 
-  String decryptAuthPass(encryptedStr, String id) {
+  String decryptAuthPass(String encryptedStr, String id) {
     final encrypter = Encrypter(AES(key!, mode: AESMode.ofb64Gctr));
-    String decrypted = encrypter.decrypt64(encryptedStr,
+    String decrypted = encrypter.decrypt64(encryptedStr.toString(),
         iv: IV.fromUtf8(
             _remoteConfig.getString(id.padRight(16, 'v').substring(0, 16))));
     return (decrypted);

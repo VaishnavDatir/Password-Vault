@@ -26,8 +26,9 @@ class AuthenticationService {
 
   Future<UserCredential> signUpUserWithEmailPassword(
       String emailId, String password) async {
-    return await _firebaseAuth!
+    UserCredential userCredential = await _firebaseAuth!
         .createUserWithEmailAndPassword(email: emailId, password: password);
+    return userCredential;
   }
 
   Future<UserCredential> signInWithEmailPassword(

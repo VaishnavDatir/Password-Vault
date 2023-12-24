@@ -47,7 +47,11 @@ class InputStringDialogDialog
             ),
             verticalSpaceMedium,
             CustomTextInputField(
-                controller: viewModel.inputTC, hintText: "Tag name"),
+                controller: viewModel.inputTC,
+                hintText: "Tag name",
+                keyboardType: TextInputType.text,
+                textCapitalization: TextCapitalization.sentences,
+                textInputAction: TextInputAction.done),
             if (listOfRecentTags.isNotEmpty) ...[
               verticalSpaceMedium,
               const Text("Recent"),

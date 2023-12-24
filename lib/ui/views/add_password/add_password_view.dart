@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:password_vault/model/password.model.dart';
 import 'package:password_vault/ui/common/app_colors.dart';
 import 'package:password_vault/ui/common/custom_text_input_field.dart';
 import 'package:password_vault/ui/common/ui_helpers.dart';
@@ -7,7 +8,8 @@ import 'package:stacked/stacked.dart';
 import 'add_password_viewmodel.dart';
 
 class AddPasswordView extends StackedView<AddPasswordViewModel> {
-  const AddPasswordView({Key? key}) : super(key: key);
+  final PasswordModel? passwordModel;
+  const AddPasswordView({this.passwordModel, Key? key}) : super(key: key);
 
   @override
   Widget builder(
@@ -17,7 +19,7 @@ class AddPasswordView extends StackedView<AddPasswordViewModel> {
   ) {
     return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.background,
-        appBar: _appBar(),
+        appBar: _appBar(context),
         body: SafeArea(
           child: Container(
             padding: const EdgeInsets.only(left: 25.0, right: 25.0),
@@ -38,9 +40,9 @@ class AddPasswordView extends StackedView<AddPasswordViewModel> {
         style: ElevatedButton.styleFrom(
             minimumSize: const Size.fromHeight(40),
             backgroundColor: kcPrimaryColorDark),
-        onPressed: () => viewModel.handleCreate(),
-        child: const Text(
-          'Create',
+        onPressed: () => viewModel.handleButtonClick(),
+        child: Text(
+          passwordModel != null ? "Update" : 'Create',
         ),
       ),
     );
@@ -66,7 +68,8 @@ class AddPasswordView extends StackedView<AddPasswordViewModel> {
             onSubmit: (value) =>
                 FocusScope.of(viewModel.scaffoldKey.currentContext!)
                     .requestFocus(viewModel.usernameFN),
-            keyboardType: TextInputType.name,
+            keyboardType: TextInputType.text,
+            textCapitalization: TextCapitalization.sentences,
             textInputAction: TextInputAction.next,
           ),
           verticalSpaceMedium,
@@ -78,7 +81,7 @@ class AddPasswordView extends StackedView<AddPasswordViewModel> {
             onSubmit: (value) =>
                 FocusScope.of(viewModel.scaffoldKey.currentContext!)
                     .requestFocus(viewModel.passwordFN),
-            keyboardType: TextInputType.name,
+            keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.next,
           ),
           verticalSpaceMedium,
@@ -91,7 +94,13 @@ class AddPasswordView extends StackedView<AddPasswordViewModel> {
             onSubmit: (value) =>
                 FocusScope.of(viewModel.scaffoldKey.currentContext!)
                     .requestFocus(viewModel.notesFN),
-            keyboardType: TextInputType.name,
+            suffixIcon: IconButton(
+              icon: Icon(viewModel.isObscureText
+                  ? Icons.visibility_off
+                  : Icons.visibility),
+              onPressed: () => viewModel.changeObsecureValue(),
+            ),
+            keyboardType: TextInputType.text,
             textInputAction: TextInputAction.next,
           ),
           verticalSpaceMedium,
@@ -100,8 +109,9 @@ class AddPasswordView extends StackedView<AddPasswordViewModel> {
             focusNode: viewModel.notesFN,
             hintText: "",
             labelText: "Notes",
-            keyboardType: TextInputType.name,
+            keyboardType: TextInputType.multiline,
             textInputAction: TextInputAction.next,
+            textCapitalization: TextCapitalization.sentences,
           ),
           const Divider(),
           Text(
@@ -121,15 +131,12 @@ class AddPasswordView extends StackedView<AddPasswordViewModel> {
     );
   }
 
-  AppBar _appBar() {
+  AppBar _appBar(BuildContext context) {
     return AppBar(
       centerTitle: true,
-      title: const Text(
-        "Add password",
-        style: TextStyle(
-            fontSize: kMediumIconSize,
-            fontWeight: FontWeight.bold,
-            color: kcPrimaryColorDark),
+      title: Text(
+        passwordModel != null ? "Update password" : "Add password",
+        style: Theme.of(context).primaryTextTheme.titleLarge,
       ),
     );
   }
@@ -145,5 +152,10 @@ class AddPasswordView extends StackedView<AddPasswordViewModel> {
   AddPasswordViewModel viewModelBuilder(
     BuildContext context,
   ) =>
-      AddPasswordViewModel();
+      AddPasswordViewModel(passwordModel);
+  @override
+  void onViewModelReady(AddPasswordViewModel viewModel) {
+    viewModel.initializeScreen();
+    super.onViewModelReady(viewModel);
+  }
 }

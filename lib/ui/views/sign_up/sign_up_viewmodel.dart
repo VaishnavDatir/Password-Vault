@@ -93,7 +93,7 @@ class SignUpViewModel extends BaseViewModel {
           name: _nameTC.text.toString(),
           deleteDate: null,
         );
-
+        await userCrendentail.user?.updateDisplayName(userModel.name);
         await _userFirestoreService.addUser(userModel);
       } else {
         throw Exception("Error while creating user!");
@@ -112,7 +112,7 @@ class SignUpViewModel extends BaseViewModel {
           variant: DialogType.error,
           title: "Sign up Error",
           description: e.message);
-    } on Exception catch (ex) {
+    } catch (ex) {
       logger.e(ex);
       _navigationService.back();
       await _dialougeService.showCustomDialog(

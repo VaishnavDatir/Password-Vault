@@ -33,6 +33,7 @@ class VaultScreenViewModel extends BaseViewModel {
 
   Future fetchPasswordList() async {
     _combinePasswords = await _passwordFirestoreService.fetchMyPasswords();
+    _combinePasswords.sort((a, b) => a.name!.compareTo(b.name!));
     notifyListeners();
   }
 

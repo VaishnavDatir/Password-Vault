@@ -10,6 +10,7 @@ PrevPassModel prevPassModelFromJson(String str) =>
 String prevPassModelToJson(PrevPassModel data) => json.encode(data.toJson());
 
 class PrevPassModel {
+  final String? name;
   final String? username;
   final String? password;
   final String? note;
@@ -19,6 +20,7 @@ class PrevPassModel {
   final String? updateType;
 
   PrevPassModel({
+    this.name,
     this.username,
     this.password,
     this.note,
@@ -29,6 +31,7 @@ class PrevPassModel {
   });
 
   factory PrevPassModel.fromJson(Map<String, dynamic> json) => PrevPassModel(
+        name: json["name"],
         username: json["username"],
         password: json["password"],
         note: json["note"],
@@ -45,6 +48,7 @@ class PrevPassModel {
       );
 
   Map<String, dynamic> toJson() => {
+        "name": name,
         "username": username,
         "password": password,
         "note": note,

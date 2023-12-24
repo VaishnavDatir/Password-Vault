@@ -72,7 +72,7 @@ class LoginViewModel extends BaseViewModel {
           variant: DialogType.error,
           title: "Sign in Error",
           description: e.message);
-    } on Exception catch (ex) {
+    } catch (ex) {
       logger.e(ex);
       _authenticationService.signOutUser();
       _navigationService.back();

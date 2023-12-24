@@ -17,6 +17,7 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await setupLocator();
+  setSystemTheme();
   setupDialogUi();
   setupBottomSheetUi();
   runApp(const MainApp());

@@ -15,14 +15,14 @@ class PasswordModel {
   final String? id;
   final String? authorId;
   final String? name;
-  final String? username;
-  final String? password;
+  String? username;
+  String? password;
   final String? note;
   final List<String>? tags;
   final List<String>? sharedAccs;
   final DateTime? createDate;
   final DateTime? updateTime;
-  final List<PrevPassModel>? prevPass;
+  List<PrevPassModel>? prevPass;
   final bool? isFav;
 
   PasswordModel({
@@ -84,4 +84,16 @@ class PasswordModel {
             : List<dynamic>.from(prevPass!.map((x) => x.toJson())),
         "isFav": isFav,
       };
+
+  void setPassword(String text) {
+    password = text;
+  }
+
+  void setUsername(String text) {
+    username = text;
+  }
+
+  void setPrevPassModel(List<PrevPassModel>? prevPassList) {
+    prevPass = prevPassList;
+  }
 }

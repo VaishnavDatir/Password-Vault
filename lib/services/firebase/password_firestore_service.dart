@@ -45,4 +45,8 @@ class PasswordFirestoreService {
     }
     return myStoredPasswords;
   }
+
+  Future<void> deletePassword(String docId) async {
+    await _passwordCollection!.doc(docId).delete();
+  }
 }
