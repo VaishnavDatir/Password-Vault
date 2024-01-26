@@ -24,7 +24,7 @@ class InputStringDialogDialog
     InputStringDialogDialogModel viewModel,
     Widget? child,
   ) {
-    List<String> listOfRecentTags = request.data;
+    List<String> listOfRecentTags = request.data ?? List.empty(growable: true);
     return Dialog(
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),

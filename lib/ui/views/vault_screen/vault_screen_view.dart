@@ -157,16 +157,20 @@ class VaultScreenView extends StackedView<VaultScreenViewModel> {
           decoration: BoxDecoration(
               color: Theme.of(context).primaryColorLight,
               borderRadius: const BorderRadius.all(Radius.circular(kRadius))),
-          child: const Row(
+          child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Flexible(
                 child: TextField(
-                  decoration: InputDecoration(
+                  keyboardType: TextInputType.text,
+                  textCapitalization: TextCapitalization.sentences,
+                  controller: viewModel.serchTc,
+                  onChanged: (value) => viewModel.handleSearchText(),
+                  decoration: const InputDecoration(
                       border: InputBorder.none, hintText: "Search"),
                 ),
               ),
-              Icon(
+              const Icon(
                 Icons.search,
               )
             ],

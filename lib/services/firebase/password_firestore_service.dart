@@ -49,4 +49,12 @@ class PasswordFirestoreService {
   Future<void> deletePassword(String docId) async {
     await _passwordCollection!.doc(docId).delete();
   }
+
+  Future<bool> deleteUsersAllPassword() async {
+    List<PasswordModel> myStoredPasswords = await fetchMyPasswords();
+    for (var element in myStoredPasswords) {
+      await _passwordCollection!.doc(element.id).delete();
+    }
+    return true;
+  }
 }

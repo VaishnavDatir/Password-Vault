@@ -256,40 +256,49 @@ class PasswordDetailView extends StackedView<PasswordDetailViewModel> {
     BuildContext context,
   ) {
     return TimelineTile(
-        alignment: TimelineAlign.start,
-        isFirst: isFirst,
-        isLast: isLast,
-        indicatorStyle: const IndicatorStyle(color: kcPrimaryColorDark),
-        beforeLineStyle: const LineStyle(color: kcPrimaryColor),
-        afterLineStyle: const LineStyle(color: kcPrimaryColor),
-        endChild: OpenContainer(
-          openBuilder: (context, action) {
-            return PasswordDetailView(
-              PasswordModel(
-                id: passwordModel.id,
-                name: prevPassModel.name,
-                note: prevPassModel.note,
-                username: prevPassModel.username,
-                password: prevPassModel.password,
-                updateTime: prevPassModel.updateTime,
-                tags: prevPassModel.tags,
-                sharedAccs: prevPassModel.sharedAccs,
+      alignment: TimelineAlign.start,
+      isFirst: isFirst,
+      isLast: isLast,
+      indicatorStyle: const IndicatorStyle(color: kcPrimaryColorDark),
+      beforeLineStyle: const LineStyle(color: kcPrimaryColor),
+      afterLineStyle: const LineStyle(color: kcPrimaryColor),
+      endChild: OpenContainer(
+        tappable: true,
+        openShape: const BeveledRectangleBorder(),
+        closedShape: const BeveledRectangleBorder(),
+        closedColor: Colors.transparent,
+        closedElevation: 0,
+        middleColor: kcWhite,
+        openColor: kcWhite,
+        openBuilder: (context, action) {
+          return PasswordDetailView(
+            PasswordModel(
+              authorId: passwordModel.authorId,
+              id: passwordModel.id,
+              name: prevPassModel.name,
+              note: prevPassModel.note,
+              username: prevPassModel.username,
+              password: prevPassModel.password,
+              updateTime: prevPassModel.updateTime,
+              tags: prevPassModel.tags,
+              sharedAccs: prevPassModel.sharedAccs,
+            ),
+            isChildItem: true,
+          );
+        },
+        closedBuilder: (context, action) {
+          return Card(
+            child: ListTile(
+              title: Text(
+                "${DateFormat.yMMMMd().format(prevPassModel.updateTime!)} ${DateFormat.jms().format(prevPassModel.updateTime!)}",
+                style: Theme.of(context).primaryTextTheme.titleMedium,
               ),
-              isChildItem: true,
-            );
-          },
-          closedBuilder: (context, action) {
-            return Card(
-              child: ListTile(
-                title: Text(
-                  "${DateFormat.yMMMMd().format(prevPassModel.updateTime!)} ${DateFormat.jms().format(prevPassModel.updateTime!)}",
-                  style: Theme.of(context).primaryTextTheme.titleMedium,
-                ),
-                subtitle: Text(prevPassModel.updateType ?? ""),
-              ),
-            );
-          },
-        ));
+              subtitle: Text(prevPassModel.updateType ?? ""),
+            ),
+          );
+        },
+      ),
+    );
   }
 
   @override

@@ -11,7 +11,7 @@ class VaultScreenViewModel extends BaseViewModel {
       locator<PasswordFirestoreService>();
 
   final TextEditingController _serchTc = TextEditingController();
-  TextEditingController get serchTx => _serchTc;
+  TextEditingController get serchTc => _serchTc;
 
   ScrollController scrollController = ScrollController();
 
@@ -24,6 +24,8 @@ class VaultScreenViewModel extends BaseViewModel {
   late List<PasswordModel> _combinePasswords;
   List<PasswordModel> get combinePasswords => _combinePasswords;
 
+  late List<PasswordModel> _originalList;
+
   void initializePage() async {
     setBusy(true);
     await fetchPasswordList();
@@ -34,6 +36,7 @@ class VaultScreenViewModel extends BaseViewModel {
   Future fetchPasswordList() async {
     _combinePasswords = await _passwordFirestoreService.fetchMyPasswords();
     _combinePasswords.sort((a, b) => a.name!.compareTo(b.name!));
+    _originalList = List.from(_combinePasswords, growable: true);
     notifyListeners();
   }
 
@@ -47,5 +50,22 @@ class VaultScreenViewModel extends BaseViewModel {
       }
       notifyListeners();
     });
+  }
+
+  void handleSearchText() {
+    String searchStr = _serchTc.text;
+    if (searchStr.trim().isNotEmpty) {
+      _combinePasswords = _originalList
+          .where((element) =>
+              ((element.name != null) &&
+                  element.name!
+                      .toLowerCase()
+                      .contains(searchStr.toLowerCase())) ||
+              ((element.tags != null) && element.tags!.contains(searchStr)))
+          .toList(growable: true);
+    } else {
+      _combinePasswords = _originalList;
+    }
+    notifyListeners();
   }
 }

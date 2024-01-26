@@ -37,6 +37,11 @@ class AuthenticationService {
         .signInWithEmailAndPassword(email: emailId, password: password);
   }
 
+  Future<bool> deleteUserAccount() async {
+    await _firebaseAuth!.currentUser!.delete();
+    return true;
+  }
+
   void signOutUser() async {
     await _firebaseAuth!.signOut();
   }

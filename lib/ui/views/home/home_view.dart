@@ -72,41 +72,44 @@ class _HomeViewState extends State<HomeView>
                           () {}, Icons.security, "Vault", viewModel, 0)
                       .animate()
                       .fadeIn(delay: const Duration(milliseconds: 500)),
+                  _addPasswordButton(),
                   customBottomBarItem(() {}, Icons.account_circle_outlined,
                           "Account", viewModel, 1)
                       .animate()
                       .fadeIn(delay: const Duration(milliseconds: 500)),
-                  OpenContainer(
-                    clipBehavior: Clip.antiAlias,
-                    closedShape: const CircleBorder(),
-                    closedColor: kcWhite,
-                    closedElevation: 0,
-                    openColor: kcWhite,
-                    transitionType: ContainerTransitionType.fadeThrough,
-                    transitionDuration: const Duration(milliseconds: 500),
-                    middleColor: kcWhite,
-                    openShape: const RoundedRectangleBorder(),
-                    closedBuilder: (context, action) {
-                      return Tooltip(
-                        message: "Add new password",
-                        child: FloatingActionButton.small(
-                          backgroundColor: kcPrimaryColorDark,
-                          shape: const CircleBorder(),
-                          onPressed: action,
-                          child:
-                              const Icon(Icons.add_moderator, color: kcWhite),
-                        ),
-                      );
-                    },
-                    openBuilder: (context, action) {
-                      return const AddPasswordView();
-                    },
-                  ).animate().fadeIn(delay: const Duration(milliseconds: 500)),
                 ],
               ),
             ).animate().scale().slideY());
       },
     );
+  }
+
+  Widget _addPasswordButton() {
+    return OpenContainer(
+      clipBehavior: Clip.antiAlias,
+      closedShape: const CircleBorder(),
+      closedColor: kcWhite,
+      closedElevation: 0,
+      openColor: kcWhite,
+      transitionType: ContainerTransitionType.fadeThrough,
+      transitionDuration: const Duration(milliseconds: 500),
+      middleColor: kcWhite,
+      openShape: const RoundedRectangleBorder(),
+      closedBuilder: (context, action) {
+        return Tooltip(
+          message: "Add new password",
+          child: FloatingActionButton.small(
+            backgroundColor: kcPrimaryColorDark,
+            shape: const CircleBorder(),
+            onPressed: action,
+            child: const Icon(Icons.add_moderator, color: kcWhite),
+          ),
+        );
+      },
+      openBuilder: (context, action) {
+        return const AddPasswordView();
+      },
+    ).animate().fadeIn(delay: const Duration(milliseconds: 500));
   }
 
   InkWell customBottomBarItem(Function onTap, IconData iconData, String title,

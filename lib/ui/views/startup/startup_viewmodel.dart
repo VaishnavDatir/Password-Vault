@@ -24,18 +24,15 @@ class StartupViewModel extends BaseViewModel {
     try {
       bool isLoggedIn = await _sharedPrefsService.read(kSpIsLoggedIn) ?? false;
       if (isLoggedIn) {
-        User? user = await _authenticationService.getCurrentUser();
-        if (null != user) {
-          _userFirestoreService.setCurrentUser(user.uid);
-        } else {
-          throw Exception("User not found!");
-        }
+        User? user = _authenticationService.getCurrentUser();
+        await _userFirestoreService.setCurrentUser(user.uid);
       }
       await Future.delayed(const Duration(seconds: 3));
       _navigationService
           .clearStackAndShow(isLoggedIn ? Routes.homeView : Routes.loginView);
     } catch (e) {
       _authenticationService.signOutUser();
+      _sharedPrefsService.clear();
       await _dialougeService.showCustomDialog(
           variant: DialogType.error,
           title: "Sign in Error",

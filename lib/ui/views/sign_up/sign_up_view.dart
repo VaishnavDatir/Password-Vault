@@ -89,6 +89,7 @@ class SignUpView extends StackedView<SignUpViewModel> {
                               .requestFocus(viewModel.mobileNoFN),
                       keyboardType: TextInputType.name,
                       textInputAction: TextInputAction.next,
+                      textCapitalization: TextCapitalization.words,
                     ),
                     verticalSpaceMedium,
                     CustomTextInputField(

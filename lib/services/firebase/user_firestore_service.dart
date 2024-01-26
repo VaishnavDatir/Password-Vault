@@ -20,7 +20,7 @@ class UserFirestoreService {
     return Future.value(_instance);
   }
 
-  void setCurrentUser(String userUid) async {
+  Future setCurrentUser(String userUid) async {
     QuerySnapshot querySnapshot =
         await _userCollection!.where("id", isEqualTo: userUid).get();
     QueryDocumentSnapshot? qds = querySnapshot.docs.firstOrNull;
@@ -34,5 +34,13 @@ class UserFirestoreService {
 
   Future<DocumentReference<Object?>> addUser(UserModel userModel) async {
     return await _userCollection!.add(userModel.toJson());
+  }
+
+  Future<bool> deleteUserDetails() async {
+    QuerySnapshot querySnapshot =
+        await _userCollection!.where("id", isEqualTo: currentUser!.id).get();
+    QueryDocumentSnapshot? qds = querySnapshot.docs.firstOrNull;
+    _userCollection!.doc(qds?.reference.id).delete();
+    return true;
   }
 }
